@@ -2,13 +2,29 @@ package ru.spbstu.appmath.Kovalev;
 
 public class Main {
     public static void main(String[] args) {
-        Parser p = new Parser();
-        p.var.setValue(Double.parseDouble(args[1]));
+        double var;
+        if (args.length == 2)
+            var = Double.parseDouble(args[1]);
+        else if (args.length == 1)
+            var = 0;
+        else {
+            System.out.println("Arguments error");
+            return;
+        }
+
+        final Expression f;
+        final Parser p = new Parser();
+        try {
+            f = p.parse(args[0]);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
         try {
-            System.out.println(p.parse(args[0]));
+            System.out.println(f.calc(var));
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 }

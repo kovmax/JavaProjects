@@ -1,125 +1,115 @@
 package ru.spbstu.appmath.Kovalev;
 
-public class Parser
-{
-    public Var var = new Var('x');
-
-    public double parse(String s) throws Exception
-    {
-        while(s.contains(" ")) {
-            s = s.replace(" ", "");
-        }
-
-        Result result = plusMinus(s);
-        if (!result.rest.isEmpty()) {
-            throw new Exception("Syntax error");
-        }
-        return result.acc;
+public class Parser {
+    public Parser() {
     }
 
-    private Result plusMinus(String s) throws Exception
-    {
-        Result current = mulDiv(s);
-        double acc = current.acc;
+    public Expression parse(String s) throws Exception{
+        /** Избавились от пробелов */
+        String trimmed = s.trim();
 
-        while (current.rest.length() > 0) {
-            if (!(current.rest.charAt(0) == '+' || current.rest.charAt(0) == '-')) {
-                break;
-            }
-
-            char sign = current.rest.charAt(0);
-            String next = current.rest.substring(1);
-
-            current = mulDiv(next);
-            if (sign == '+') {
-                acc += current.acc;
-            } else {
-                acc -= current.acc;
-            }
+        /** Ищем плюс или минус вне скобок */
+        int addSignPos = findPosOperator(trimmed, '+');
+        int subSignPos = findPosOperator(trimmed, '-');
+        if (addSignPos != -1 && (subSignPos == -1 || addSignPos <  subSignPos)) {
+            return new Complex(parse(trimmed.substring(0, addSignPos)), parse(trimmed.substring(addSignPos + 1)), '+');
+        } else if (subSignPos != -1) {
+            return new Complex(parse(trimmed.substring(0, subSignPos)), parse(trimmed.substring(subSignPos + 1)), '-');
         }
-        return new Result(acc, current.rest);
+
+        /** Ищем умножить вне скобок */
+        int mulSignPos = findPosOperator(trimmed, '*');
+        if (mulSignPos != -1) {
+            return new Complex(parse(trimmed.substring(0, mulSignPos)), parse(trimmed.substring(mulSignPos + 1)), '*');
+        }
+
+        /** Ищем делить вне скобок */
+        int divSignPos = findPosOperator(trimmed, '/');
+        if (divSignPos != -1) {
+            return new Complex(parse(trimmed.substring(0, divSignPos)), parse(trimmed.substring(divSignPos + 1)), '/');
+        }
+
+        /** Ищем содержимое в скобках и рекурсивно парсим */
+        final int openBracketPos = trimmed.indexOf('(');
+        final int closeBracketPos = trimmed.lastIndexOf(')');
+        if (openBracketPos != -1 && closeBracketPos != -1 && openBracketPos < closeBracketPos) {
+            return parse(trimmed.substring(openBracketPos + 1, closeBracketPos));
+        }
+
+        /** Ищем константу или переменную в случае отсутствия скобок */
+        if (openBracketPos == -1 && closeBracketPos == -1) {
+            if (isNumber(trimmed)) {
+                if (trimmed.equals(""))
+                    return new Const(0);
+                return new Const(Double.parseDouble(trimmed));
+            }
+            if ("x".equals(trimmed)) {
+                return new Var();
+            }
+            throw new Exception("Syntax error!");
+        }
+        throw new Exception("Syntax error!");
     }
 
-    private Result mulDiv(String s) throws Exception
-    {
-        Result current = bracket(s);
+    private static boolean isNumber(String s) {
+        if (s.equals(""))
+            return true;
+        for (char c : s.toCharArray()) {
+            if (!Character.isDigit(c) && c != '.')
+                return false;
+        }
+        return true;
+    }
 
-        double acc = current.acc;
-        while (true) {
-            if (current.rest.length() == 0) {
-                return current;
+    private int findPosOperator(String trimmed, char op) throws Exception{
+        int index = 0;
+        int pos;
+        do {
+            pos = trimmed.indexOf(op, index);
+            index = getIndexLastClose(trimmed, pos);
+        } while (inBrackets(trimmed, pos));
+        return pos;
+    }
+
+    private static boolean inBrackets(String s, int i) {
+        if (i != -1)
+        {
+            int cOpen = 0;
+            int cClose = 0;
+            for (int j = 0; j < i; j++) {
+                if (s.charAt(j) == '(')
+                    cOpen++;
+                if (s.charAt(j) == ')')
+                    cClose++;
             }
-
-            char sign = current.rest.charAt(0);
-            if ((sign != '*' && sign != '/'))
-                return current;
-
-            String next = current.rest.substring(1);
-            Result right = bracket(next);
-
-            if (sign == '*') {
-                acc *= right.acc;
-            } else {
-                if (right.acc != 0) {
-                    acc /= right.acc;
-                } else {
-                    throw new Exception("Calculation error");
-                }
-            }
-
-            current = new Result(acc, right.rest);
+            return cOpen != cClose;
+        } else {
+            return false;
         }
     }
 
-    private Result bracket(String s) throws Exception
-    {
-        char zeroChar = s.charAt(0);
-        if (zeroChar == '(') {
-            Result r = plusMinus(s.substring(1));
-            if (!r.rest.isEmpty() && r.rest.charAt(0) == ')') {
-                r.rest = r.rest.substring(1);
-            } else {
-                throw new Exception("Syntax error");
+    private static int getIndexLastClose(String s, int i) throws Exception{
+        if (i != -1)
+        {
+            int cOpen = 0;
+            int cClose = 0;
+            for (int j = 0; j < i ; j++) {
+                if (s.charAt(j) == '(')
+                    cOpen++;
+                if (s.charAt(j) == ')')
+                    cClose++;
             }
-            return r;
-        }
-        return variable(s);
-    }
-
-    private Result variable(String s) throws Exception
-    {
-        if (s.charAt(0) == var.getName()) {
-                return new Result(var.getValue(), s.substring(1));
-        }
-        return number(s);
-    }
-
-    private Result number(String s) throws Exception
-    {
-        int i = 0;
-        int cDot = 0;
-        boolean negative = false;
-
-        if(s.charAt(0) == '-') {
-            negative = true;
-            s = s.substring(1);
-        }
-
-        while (i < s.length() && (Character.isDigit(s.charAt(i)) || s.charAt(i) == '.')) {
-            if (s.charAt(i) == '.' && ++cDot > 1) {
-                throw new Exception("Syntax error");
+            int index = i;
+            while (cOpen != cClose) {
+                index = s.indexOf(')', index + 1);
+                if (index != -1)
+                    cClose++;
+                else
+                    throw new Exception("Syntax error");
             }
-            i++;
+            return index + 1;
         }
-        if (i == 0) {
-            throw new Exception("Syntax error");
-        }
-
-        double dPart = Double.parseDouble(s.substring(0, i));
-        if (negative)
-            dPart = -dPart;
-        String restPart = s.substring(i);
-
-        return new Result(dPart, restPart);
+        else
+            return 0;
     }
-} 
+}
