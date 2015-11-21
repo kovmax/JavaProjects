@@ -11,7 +11,7 @@ import java.util.Vector;
 
 public class CalcTest extends FileWork {
     private Parser p = new Parser();
-    static final String path = "C:\\Users\\Максим\\IdeaProjects\\Lab4\\src\\test\\java\\ru\\spbstu\\appmath\\kovalev\\files\\";
+    static final String path = "files\\test\\";
     static final File fileIn1 = new File(path + "tasks.txt");
     static final File fileIn2 = new File(path + "answers.txt");
     private static final Vector<String> data = read(fileIn1);

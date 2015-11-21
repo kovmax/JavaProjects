@@ -86,7 +86,7 @@ public class FileWork {
 
     public static void main(String[] args) {
         FileWork f = new FileWork();
-        final String path = "C:\\Users\\Максим\\IdeaProjects\\Lab4\\src\\main\\java\\ru\\spbstu\\appmath\\kovalev\\files\\";
+        final String path = "files\\main\\";
         f.doCalculations(path + "tasks.txt", path + "results.txt", "1 : 10");
     }
 }
