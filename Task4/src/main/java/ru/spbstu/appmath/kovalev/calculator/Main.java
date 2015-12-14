@@ -1,4 +1,4 @@
-package ru.spbstu.appmath.kovalev;
+package ru.spbstu.appmath.kovalev.calculator;
 
 public class Main {
     public static void main(String[] args) {

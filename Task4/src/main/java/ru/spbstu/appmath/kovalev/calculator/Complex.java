@@ -1,4 +1,6 @@
-package ru.spbstu.appmath.kovalev;
+package ru.spbstu.appmath.kovalev.calculator;
+
+import ru.spbstu.appmath.kovalev.exceptions.CalculationException;
 
 public class Complex implements Expression{
     private Expression left;
@@ -11,7 +13,7 @@ public class Complex implements Expression{
         this.operation = operation;
     }
 
-    public double calc(double x) throws Exception{
+    public double calc(double x) throws CalculationException{
         double res_left = this.left.calc(x);
         double res_right = this.right.calc(x);
         double result;
@@ -27,7 +29,7 @@ public class Complex implements Expression{
                 break;
             case '/':
                 if (res_right == 0)
-                    throw new Exception("Division by zero");
+                    throw new CalculationException("Division by zero");
                 result = res_left / res_right;
                 break;
             default:

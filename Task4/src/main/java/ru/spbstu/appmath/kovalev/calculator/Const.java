@@ -1,4 +1,4 @@
-package ru.spbstu.appmath.kovalev;
+package ru.spbstu.appmath.kovalev.calculator;
 
 public class Const implements Expression {
     private double value;

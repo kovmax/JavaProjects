@@ -1,69 +1,64 @@
 package ru.spbstu.appmath.kovalev;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import ru.spbstu.appmath.kovalev.calculator.Expression;
+import ru.spbstu.appmath.kovalev.calculator.Parser;
+import ru.spbstu.appmath.kovalev.exceptions.CalculationException;
+import ru.spbstu.appmath.kovalev.exceptions.SyntaxException;
 
 import java.io.File;
-import java.util.Vector;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Scanner;
 
 
-public class CalcTest extends FileWork {
-    private Parser p = new Parser();
-    static final String path = "files\\test\\";
-    static final File fileIn1 = new File(path + "tasks.txt");
-    static final File fileIn2 = new File(path + "answers.txt");
-    private static final Vector<String> data = read(fileIn1);
-    private static final Vector<String> answers = read(fileIn2);
+@RunWith(Parameterized.class)
+public class CalcTest {
+    private static final Parser p = new Parser();
+    private String expression;
+    private String result;
+    private int variable;
 
-   @Test
-    public void test() throws Exception{
-        for (int i = 0; i < 6; i++) {
-            Expression f = p.parse(data.elementAt(i));
-            Assert.assertEquals(String.valueOf(f.calc(i)), answers.elementAt(i));
+    private static ArrayList<Object[]> initializeTestData() throws FileNotFoundException {
+        final String PATH = Paths.get("src", "files", "test", "tasks.txt").toString();
+        Scanner f = new Scanner(new File(PATH));
+        ArrayList<Object[]> tests = new ArrayList<Object[]>();
+        int var = 0;
+        while (f.hasNextLine()) {
+            String line = f.nextLine();
+            String[] data = line.split("\\|");
+            tests.add(new Object[]{data[0], data[1], var});
+            var++;
+        }
+        return tests;
+    }
+
+    public CalcTest(String expression, String result, int variable) {
+        this.expression = expression;
+        this.result = result;
+        this.variable = variable;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> testData() throws Exception{
+        return initializeTestData();
+    }
+
+    @Test
+    public void test() {
+        try {
+            Expression f = p.parse(expression);
+            Assert.assertEquals(String.valueOf(f.calc(variable)), result);
+        } catch (SyntaxException e) {
+            Assert.assertEquals(e.getMessage(), result);
+        } catch (CalculationException e) {
+            Assert.assertEquals(e.getMessage(), result);
         }
     }
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Test
-    public void testException1() throws Exception {
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("Discrepancy between the number of brackets");
-        Expression f = p.parse(data.elementAt(6));
-        double result = f.calc(6);
-        System.out.println(result);
-    }
-
-    @Test
-    public void testException2() throws Exception {
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("Division by zero");
-        Expression f = p.parse(data.elementAt(7));
-        double result = f.calc(7);
-        System.out.println(result);
-    }
-
-    @Test
-    public void testException3() throws Exception {
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("Sign error");
-        Expression f = p.parse(data.elementAt(8));
-        double result = f.calc(8);
-        System.out.println(result);
-    }
-
-    @Test
-    public void testException4() throws Exception {
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("Extraneous characters");
-        Expression f = p.parse(data.elementAt(9));
-        double result = f.calc(9);
-        System.out.println(result);
-    }
-
-
 }
 

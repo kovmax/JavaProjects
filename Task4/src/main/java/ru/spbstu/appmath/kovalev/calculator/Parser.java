@@ -1,7 +1,13 @@
-package ru.spbstu.appmath.kovalev;
+package ru.spbstu.appmath.kovalev.calculator;
+
+import ru.spbstu.appmath.kovalev.exceptions.SyntaxException;
 
 public class Parser {
-    public Expression parse(String s) throws Exception {
+    public Expression parse(String s) throws SyntaxException {
+        /** Разобрались со скобками */
+        if (!countBrackets(s, s.length()))
+            throw new SyntaxException("Discrepancy between the number of brackets");
+
         /** Избавились от пробелов */
         String trimmed = s.trim();
 
@@ -45,9 +51,9 @@ public class Parser {
 
         /** Если ничего хорошего не выцепили, то разбираем плохое */
         if (trimmed.equals("")) {
-            throw new Exception("Sign error");
+            throw new SyntaxException("Missed argument");
         } else {
-            throw new Exception("Extraneous characters");
+            throw new SyntaxException("Extraneous characters");
         }
     }
 
@@ -61,7 +67,7 @@ public class Parser {
         return true;
     }
 
-    private static int findPosOperator(String trimmed, char op) throws Exception {
+    private static int findPosOperator(String trimmed, char op) {
         int index = 0;
         int pos;
         do {
@@ -72,25 +78,17 @@ public class Parser {
     }
 
     private static boolean inBrackets(String s, int i) {
+        if (i != -1)
+            return !countBrackets(s, i);
+        else
+            return false;
+    }
+
+    private static int getIndexLastClose(String s, int i) {
         if (i != -1) {
             int cOpen = 0;
             int cClose = 0;
             for (int j = 0; j < i; j++) {
-                if (s.charAt(j) == '(')
-                    cOpen++;
-                if (s.charAt(j) == ')')
-                    cClose++;
-            }
-            return cOpen != cClose;
-        } else
-            return false;
-    }
-
-    private static int getIndexLastClose(String s, int i) throws Exception {
-        if (i != -1) {
-            int cOpen = 0;
-            int cClose = 0;
-            for (int j = 0; j < i ; j++) {
                 if (s.charAt(j) == '(')
                     cOpen++;
                 if (s.charAt(j) == ')')
@@ -101,12 +99,24 @@ public class Parser {
                 index = s.indexOf(')', index + 1);
                 if (index != -1)
                     cClose++;
-                else
-                    throw new Exception("Discrepancy between the number of brackets");
+                /*else
+                    throw new SyntaxException("Discrepancy between the number of brackets");*/
             }
             return index + 1;
         }
         else
             return 0;
+    }
+
+    private static boolean countBrackets(String s, int length) {
+        int cOpen = 0;
+        int cClose = 0;
+        for (int j = 0; j < length; j++) {
+            if (s.charAt(j) == '(')
+                cOpen++;
+            if (s.charAt(j) == ')')
+                cClose++;
+        }
+        return cOpen == cClose;
     }
 }

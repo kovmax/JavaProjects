@@ -4,12 +4,9 @@ public class Range {
     private int min;
     private int max;
     private int step;
-    private int amount;
 
-    public Range(String s) {
-        while(s.contains(" ")) {
-            s = s.replace(" ", "");
-        }
+    public Range(String s)  {
+        s = s.replaceAll(" ", "");
 
         String min = s.substring(0, s.indexOf(':'));
         s = s.substring(s.indexOf(':') + 1);
@@ -32,12 +29,6 @@ public class Range {
         } else {
             this.step = 1;
         }
-
-        int amount = 0;
-        for (int i = this.min; i <= this.max; i += this.step) {
-            amount++;
-        }
-        this.amount = amount;
     }
 
     public int getMin() {
@@ -50,9 +41,5 @@ public class Range {
 
     public int getStep() {
         return step;
-    }
-
-    public int getAmount() {
-        return amount;
     }
 }
