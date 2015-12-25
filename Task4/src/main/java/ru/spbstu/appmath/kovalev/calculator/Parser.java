@@ -33,8 +33,8 @@ public class Parser {
         }
 
         /** Ищем содержимое в скобках и рекурсивно парсим */
-        final int openBracketPos = trimmed.indexOf('(');
-        final int closeBracketPos = trimmed.lastIndexOf(')');
+        int openBracketPos = trimmed.indexOf('(');
+        int closeBracketPos = trimmed.lastIndexOf(')');
         if (openBracketPos != -1 && closeBracketPos != -1 && openBracketPos < closeBracketPos) {
             return parse(trimmed.substring(openBracketPos + 1, closeBracketPos));
         }

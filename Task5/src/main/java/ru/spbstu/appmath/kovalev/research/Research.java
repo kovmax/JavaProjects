@@ -1,7 +1,7 @@
 package ru.spbstu.appmath.kovalev.research;
 
 import ru.spbstu.appmath.kovalev.Matrix;
-import ru.spbstu.appmath.kovalev.MatrixMultiply;
+import ru.spbstu.appmath.kovalev.MatrixMultiplying;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ public class Research {
             for (int i = 1; i <= maxNumThreads; i++) {
                 try {
                     final long startTime = System.currentTimeMillis();
-                    Matrix result = new MatrixMultiply(m1, m2, i).multiply();
+                    Matrix result = new MatrixMultiplying(m1, m2, i).multiply();
                     final long executionTime = System.currentTimeMillis() - startTime;
                     values[i - 1][j - 1] = executionTime;
                 } catch (Exception e) {

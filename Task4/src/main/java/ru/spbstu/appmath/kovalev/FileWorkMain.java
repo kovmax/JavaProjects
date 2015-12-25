@@ -10,8 +10,8 @@ public class FileWorkMain {
         final int max = range.getMax();
         final int step = range.getStep();
         final FileWork f = new FileWork();
-        final String PATH_1 = Paths.get("src", "files", "main", args[0]).toString();
-        final String PATH_2 = Paths.get("src", "files", "main", args[1]).toString();
-        f.doCalculations(PATH_1, PATH_2, min, max, step);
+        final String path1 = Paths.get("src", "files", "main", args[0]).toString();
+        final String path2 = Paths.get("src", "files", "main", args[1]).toString();
+        f.doCalculations(path1, path2, min, max, step);
     }
 }

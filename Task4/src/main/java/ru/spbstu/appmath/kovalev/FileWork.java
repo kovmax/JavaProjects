@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileWork {
-    public void doCalculations(final String in, final String out, final int min, final int max, final int step) {
+    public void doCalculations(String in, String out, int min, int max, int step) {
         final File fileIn = new File(in);
         final File fileOut = new File(out);
 
@@ -42,7 +42,7 @@ public class FileWork {
         write(fileOut, result);
     }
 
-    private static void createIfNeeded(final File file) {
+    private static void createIfNeeded(File file) {
         try {
             if (file.createNewFile()) {
                 System.out.println("Created new file: " + file.getCanonicalPath());
@@ -54,7 +54,7 @@ public class FileWork {
         }
     }
 
-    protected static ArrayList<String> read(final File file) {
+    protected static ArrayList<String> read(File file) {
         ArrayList<String> result = new ArrayList<>();
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
@@ -68,7 +68,7 @@ public class FileWork {
         return result;
     }
 
-    protected static void write(final File file, final List<ArrayList<Object>> arr) {
+    protected static void write(File file, List<ArrayList<Object>> arr) {
         try (PrintWriter writer = new PrintWriter(file)){
             int len[] = maxLengthArr(arr);
             for (int i = 0; i < arr.get(0).size(); i++) {

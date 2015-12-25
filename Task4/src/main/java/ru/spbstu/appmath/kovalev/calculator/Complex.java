@@ -7,7 +7,7 @@ public class Complex implements Expression{
     private Expression right;
     private char operation;
 
-    public Complex(Expression left, Expression right, char operation) {
+    public Complex(final Expression left, final Expression right, final char operation) {
         this.left = left;
         this.right = right;
         this.operation = operation;

@@ -1,6 +1,9 @@
 package ru.spbstu.appmath.kovalev;
 
+import ru.spbstu.appmath.kovalev.exceptions.MatrixException;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -19,21 +22,27 @@ public class Matrix {
         this.data = new double[nRows][nColumns];
     }
 
-    public Matrix(File file)throws IOException {
+    public Matrix(File file) throws MatrixException {
         int nRows = 0;
         int nColumns = 0;
         List<String []> data = new ArrayList<>();
-        Scanner input = new Scanner(file);
-        while(input.hasNextLine()) {
-            String[] values = input.nextLine().split(" ");
-            if (nRows == 0)
-                nColumns = values.length;
-            if (nRows > 0 && nColumns != values.length)
-                throw new IOException("Invalid matrix: " + file.getName());
-            nRows++;
-            data.add(values);
+        try(Scanner input = new Scanner(file)) {
+            while(input.hasNextLine()) {
+                String[] values = input.nextLine().split(" ");
+                if (nRows == 0)
+                    nColumns = values.length;
+                if (nRows > 0 && nColumns != values.length) {
+                    input.close();
+                    throw new MatrixException("Invalid matrix: " + file.getName());
+                }
+                nRows++;
+                data.add(values);
+            }
+            input.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
-        input.close();
+
 
         this.nRows = nRows;
         this.nColumns = nColumns;
@@ -61,9 +70,9 @@ public class Matrix {
         this.data[i][j] = value;
     }
 
-    public void createIdentity() throws IOException {
+    public void createIdentity() throws MatrixException {
         if (nRows != nColumns)
-            throw new IOException("Rows count doesn't match with columns count");
+            throw new MatrixException("Rows count doesn't match with columns count");
         for (int i = 0; i < nRows; i++) {
             for (int j = 0; j < nColumns; j++) {
                 if (i != j)
@@ -83,41 +92,30 @@ public class Matrix {
         }
     }
 
-    public void print() {
-        for (int i = 0; i < nRows; i++) {
-            for (int j = 0; j < nColumns; j++) {
-                System.out.print(data[i][j]);
-                if (j - 1 != nColumns)
-                    System.out.print(" ");
+//    public void print() {
+//        for (int i = 0; i < nRows; i++) {
+//            for (int j = 0; j < nColumns; j++) {
+//                System.out.print(data[i][j]);
+//                if (j - 1 != nColumns)
+//                    System.out.print(" ");
+//            }
+//            System.out.println();
+//        }
+//    }
+
+    public void printInFile(File file) {
+        try(PrintWriter printWriter = new PrintWriter(file)) {
+            for (int i = 0; i < nRows; i++) {
+                for (int j = 0; j < nColumns; j++) {
+                    printWriter.print(data[i][j]);
+                    if (j - 1 != nColumns)
+                        printWriter.print(" ");
+                }
+                printWriter.println();
             }
-            System.out.println();
+            printWriter.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
-
-    public void printInFile(File file) throws IOException {
-        createIfNeeded(file);
-        PrintWriter printWriter = new PrintWriter(file);
-        for (int i = 0; i < nRows; i++) {
-            for (int j = 0; j < nColumns; j++) {
-                printWriter.print(data[i][j]);
-                if (j - 1 != nColumns)
-                    printWriter.print(" ");
-            }
-            printWriter.println();
-        }
-        printWriter.close();
-    }
-
-    private static void createIfNeeded(final File file) {
-        try {
-            if (file.createNewFile()) {
-                System.out.println("Created new file: " + file.getCanonicalPath());
-            } else {
-                System.out.println("File already exists at " + file.getCanonicalPath());
-            }
-        } catch (IOException e) {
-            System.out.println("Failed to create file: " + e.getMessage());
-        }
-    }
-
 }

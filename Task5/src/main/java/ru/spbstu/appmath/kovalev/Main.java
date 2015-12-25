@@ -1,7 +1,6 @@
 package ru.spbstu.appmath.kovalev;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +14,7 @@ public class Main {
             if (args.length == 4)
                 nThreads = Integer.parseInt(args[3]);
             final long startTime = System.currentTimeMillis();
-            Matrix result = new MatrixMultiply(matrix1, matrix2, nThreads).multiply();
+            Matrix result = new MatrixMultiplying(matrix1, matrix2, nThreads).multiply();
             final long executionTime = System.currentTimeMillis() - startTime;
             result.printInFile(file);
             System.out.println("Execution time: " + executionTime + " mls");

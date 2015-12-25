@@ -1,8 +1,10 @@
 package ru.spbstu.appmath.kovalev.calculator;
 
+import ru.spbstu.appmath.kovalev.exceptions.CalculatorAppException;
+
 public class Main {
     public static void main(String[] args) {
-        double var;
+        final double var;
         if (args.length == 2)
             var = Double.parseDouble(args[1]);
         else if (args.length == 1)
@@ -16,14 +18,14 @@ public class Main {
         final Parser p = new Parser();
         try {
             f = p.parse(args[0]);
-        } catch (Exception e) {
+        } catch (CalculatorAppException e) {
             System.out.println(e.getMessage());
             return;
         }
 
         try {
             System.out.println(f.calc(var));
-        } catch (Exception e) {
+        } catch (CalculatorAppException e) {
             System.out.println(e.getMessage());
         }
     }
